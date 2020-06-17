@@ -19,7 +19,7 @@ public class ListenerHandler {
      *
      * @param event The event to be called.
      */
-    public void callEvent(Object event) {
+    public void callEvent(Event event) {
         for(Listener listener : listeners)
             for(Method method : listener.getClass().getMethods())
                 if(method.isAnnotationPresent(EventHandler.class)) {

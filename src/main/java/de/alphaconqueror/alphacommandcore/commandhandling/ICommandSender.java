@@ -20,7 +20,7 @@ public interface ICommandSender {
      *
      * @param permission The permission to be added.
      */
-    public void addPermission(IPermission permission);
+    public ICommandSender addPermission(IPermission permission);
 
     /**
      * Used to verify if the command sender has a certain permission.

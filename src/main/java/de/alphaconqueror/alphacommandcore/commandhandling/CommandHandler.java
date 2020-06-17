@@ -26,7 +26,7 @@ public class CommandHandler {
      * @param message The unparsed message containing invoke and arguments.
      * @param sender  The sender of the message.
      */
-    public void handleCommand(String message, ICommandSender sender) {
+    public CommandError handleCommand(String message, ICommandSender sender) {
         final ListenerHandler listenerHandler = AlphaCommandCore.getListenerHandler();
         CommandError commandError = null;
         String permission = "";
@@ -57,6 +57,8 @@ public class CommandHandler {
         }
 
         listenerHandler.callEvent(new CommandCalledEvent(commandContainer.getSender(), commandContainer.getInvoke(), commandContainer.getArgs(), commandError));
+
+        return commandError;
     }
 
     /**
@@ -67,7 +69,7 @@ public class CommandHandler {
      *
      * @return The command container containing all information about the command.
      */
-    public CommandContainer parse(String message, ICommandSender sender) {
+    private CommandContainer parse(String message, ICommandSender sender) {
         String[] split = message.split(" "),
                 args = new String[split.length - 1];
         List<String> splitList = new LinkedList<String>();
