@@ -8,7 +8,7 @@ package de.alphaconqueror.alphacommandcore.commandhandling;
 
 import de.alphaconqueror.alphacommandcore.AlphaCommandCore;
 import de.alphaconqueror.alphacommandcore.eventhandling.CommandCalledEvent;
-import de.alphaconqueror.alphacommandcore.eventhandling.ListenerHandler;
+import de.alphaconqueror.alphaeventcore.eventhandling.ListenerHandler;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

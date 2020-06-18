@@ -8,6 +8,7 @@ package de.alphaconqueror.alphacommandcore.eventhandling;
 
 import de.alphaconqueror.alphacommandcore.commandhandling.CommandError;
 import de.alphaconqueror.alphacommandcore.commandhandling.ICommandSender;
+import de.alphaconqueror.alphaeventcore.eventhandling.Event;
 
 public class CommandCalledEvent extends Event {
 
