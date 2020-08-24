@@ -6,19 +6,15 @@
 
 package de.alphaconqueror.alphacommandcore.commandhandling;
 
-import de.alphaconqueror.alphacommandcore.AlphaCommandCore;
 import de.alphaconqueror.alphacommandcore.eventhandling.CommandCalledEvent;
-import de.alphaconqueror.alphaeventcore.eventhandling.ListenerHandler;
+import de.alphaconqueror.alphaeventcore.AlphaEventCore;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CommandHandler {
 
-    private final Map<String, ICommand> commands = new HashMap<String, ICommand>();
+    private final Map<String, ICommand> commands = new HashMap<>();
 
     /**
      * Used to handle a command.
@@ -27,7 +23,6 @@ public class CommandHandler {
      * @param sender  The sender of the message.
      */
     public CommandError handleCommand(String message, ICommandSender sender) {
-        final ListenerHandler listenerHandler = AlphaCommandCore.getListenerHandler();
         CommandError commandError = null;
         String permission = "";
 
@@ -42,7 +37,7 @@ public class CommandHandler {
             }
         }
 
-        if (permission != null && !permission.equals("")) {
+        if (!permission.equals("")) {
             if(!commandContainer.getSender().hasPermission(permission))
                 commandError =  CommandError.ERROR_PERMISSION;
         }
@@ -56,7 +51,7 @@ public class CommandHandler {
                 commandError = CommandError.ERROR_COMMAND_NOT_FOUND;
         }
 
-        listenerHandler.callEvent(new CommandCalledEvent(commandContainer.getSender(), commandContainer.getInvoke(), commandContainer.getArgs(), commandError));
+        AlphaEventCore.callEvent(new CommandCalledEvent(commandContainer.getSender(), commandContainer.getInvoke(), commandContainer.getArgs(), commandError));
 
         return commandError;
     }
@@ -72,10 +67,9 @@ public class CommandHandler {
     private CommandContainer parse(String message, ICommandSender sender) {
         String[] split = message.split(" "),
                 args = new String[split.length - 1];
-        List<String> splitList = new LinkedList<String>();
+        List<String> splitList = new LinkedList<>();
 
-        for (String s : split)
-            splitList.add(s);
+        Collections.addAll(splitList, split);
 
         splitList.subList(1, splitList.size()).toArray(args);
 

@@ -7,13 +7,10 @@
 package de.alphaconqueror.alphacommandcore;
 
 import de.alphaconqueror.alphacommandcore.commandhandling.CommandHandler;
-import de.alphaconqueror.alphaeventcore.AlphaEventCore;
-import de.alphaconqueror.alphaeventcore.eventhandling.ListenerHandler;
 
 public class AlphaCommandCore {
 
-    private final static CommandHandler commandHandler = new CommandHandler();
-    private final static ListenerHandler listenerHandler = AlphaEventCore.getListenerHandler();
+    private static final CommandHandler commandHandler = new CommandHandler();
 
     /**
      * Used to get the {@link CommandHandler}.
@@ -22,14 +19,5 @@ public class AlphaCommandCore {
      */
     public static CommandHandler getCommandHandler() {
         return commandHandler;
-    }
-
-    /**
-     * Used to get the {@link ListenerHandler}.
-     *
-     * @return The listener handler.
-     */
-    public static ListenerHandler getListenerHandler() {
-        return listenerHandler;
     }
 }

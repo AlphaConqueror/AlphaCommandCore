@@ -13,14 +13,14 @@ public interface ICommandSender {
      *
      * @return The name of the command sender.
      */
-    public String getName();
+    String getName();
 
     /**
      * Used to add a permission to the command sender.
      *
      * @param permission The permission to be added.
      */
-    public ICommandSender addPermission(IPermission permission);
+    ICommandSender addPermission(IPermission permission);
 
     /**
      * Used to verify if the command sender has a certain permission.
@@ -29,5 +29,5 @@ public interface ICommandSender {
      *
      * @return True, if the command sender has the permission, false, if otherwise.
      */
-    public boolean hasPermission(String permission);
+    boolean hasPermission(String permission);
 }

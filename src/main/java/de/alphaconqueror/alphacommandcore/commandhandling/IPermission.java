@@ -14,5 +14,5 @@ public interface IPermission {
      *
      * @return The identifier of the permission.
      */
-    public String getIdentifier();
+    String getIdentifier();
 }
