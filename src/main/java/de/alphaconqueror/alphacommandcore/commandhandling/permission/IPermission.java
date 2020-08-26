@@ -9,7 +9,7 @@ package de.alphaconqueror.alphacommandcore.commandhandling.permission;
 public interface IPermission {
 
     /**
-     * Used to get the identifier of the permission.
+     * Gets the identifier of the permission.
      * Every permission has a certain identifier.
      *
      * @return The identifier of the permission.

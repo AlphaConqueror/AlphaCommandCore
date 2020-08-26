@@ -14,10 +14,10 @@ public interface ICommand {
      * @param sender The command sender.
      * @param args   A list of all arguments given.
      *
-     * @return {@code CommandError.ERROR_OK} if command has been handled correctly,
-     *         other command error specific to the reason if it has not.
+     * @return An executable {@link CommandResult}, if the command has been handled correctly,
+     *         a not executable command result, if it has not.
      */
-    CommandError handle(final ICommandSender sender, final String[] args);
+    CommandResult handle(final ICommandSender sender, final String[] args);
 
     /**
      * Gets the invoke used to call the command.

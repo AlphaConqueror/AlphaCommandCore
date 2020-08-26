@@ -13,7 +13,7 @@ public class AlphaCommandCore {
     private static final CommandHandler commandHandler = new CommandHandler();
 
     /**
-     * Used to get the {@link CommandHandler}.
+     * Gets the {@link CommandHandler}.
      *
      * @return The command handler.
      */

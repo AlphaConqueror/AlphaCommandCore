@@ -18,7 +18,7 @@ public interface ICommandSender {
     void sendMessage(String message);
 
     /**
-     * Add a permission to the command sender.
+     * Adds a permission to the command sender.
      *
      * @param permission The permission to be added.
      */

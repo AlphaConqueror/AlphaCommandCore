@@ -18,13 +18,15 @@ public class CommandHandler {
     private final Map<String, ICommand> commands = new HashMap<>();
 
     /**
-     * Used to handle a command.
+     * Handles an {@link ICommand}.
      *
      * @param message The unparsed message containing invoke and arguments.
      * @param sender  The sender of the message.
+     *
+     * @return The {@link CommandResult} of the handled command.
      */
-    public CommandError handleCommand(String message, ICommandSender sender) {
-        CommandError commandError = null;
+    public CommandResult handleCommand(String message, ICommandSender sender) {
+        CommandResult commandError = null;
         String permission = "";
 
         final CommandContainer commandContainer = parse(message, sender);
@@ -38,9 +40,9 @@ public class CommandHandler {
             }
         }
 
-        if (!permission.equals("")) {
+        if (!permission.isEmpty()) {
             if(!commandContainer.getSender().hasPermission(permission))
-                commandError =  CommandError.ERROR_PERMISSION;
+                commandError = new CommandResult.ERROR_PERMISSION(permission);
         }
 
         if(commandError == null) {
@@ -49,7 +51,7 @@ public class CommandHandler {
 
                 commandError = command.handle(commandContainer.getSender(), commandContainer.getArgs());
             } else
-                commandError = CommandError.ERROR_COMMAND_NOT_FOUND;
+                commandError = new CommandResult.ERROR_COMMAND_NOT_FOUND(commandContainer.getInvoke());
         }
 
         AlphaEventCore.callEvent(new CommandCalledEvent(commandContainer.getSender(), commandContainer.getArgs(), commandError));
@@ -58,7 +60,7 @@ public class CommandHandler {
     }
 
     /**
-     * Used to parse a message into a {@link CommandContainer}.
+     * Parses a message into a {@link CommandContainer}.
      *
      * @param message The unparsed message.
      * @param sender  The sender of the message.
@@ -78,7 +80,7 @@ public class CommandHandler {
     }
 
     /**
-     * Used to get a {@link Map} of {@link ICommand}s related to their invokes.
+     * Gets a {@link Map} of {@link ICommand}s related to their invokes.
      *
      * @return A map containing commands related to their invokes.
      */
@@ -87,7 +89,7 @@ public class CommandHandler {
     }
 
     /**
-     * Used to register commands.
+     * Registers a {@link ICommand}.
      *
      * @param invoke  The keyword the command is related to.
      * @param command The command to be added.
