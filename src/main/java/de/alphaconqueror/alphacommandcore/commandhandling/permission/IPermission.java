@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-package de.alphaconqueror.alphacommandcore.commandhandling;
+package de.alphaconqueror.alphacommandcore.commandhandling.permission;
 
 public interface IPermission {
 

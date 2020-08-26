@@ -6,6 +6,7 @@
 
 package de.alphaconqueror.alphacommandcore.commandhandling;
 
+import de.alphaconqueror.alphacommandcore.commandhandling.permission.PermissionRequired;
 import de.alphaconqueror.alphacommandcore.eventhandling.CommandCalledEvent;
 import de.alphaconqueror.alphaeventcore.AlphaEventCore;
 
@@ -46,12 +47,12 @@ public class CommandHandler {
             if(commands.containsKey(commandContainer.getInvoke())) {
                 ICommand command = commands.get(commandContainer.getInvoke());
 
-                commandError = command.handle(commandContainer.getSender(), commandContainer.getInvoke(), commandContainer.getArgs());
+                commandError = command.handle(commandContainer.getSender(), commandContainer.getArgs());
             } else
                 commandError = CommandError.ERROR_COMMAND_NOT_FOUND;
         }
 
-        AlphaEventCore.callEvent(new CommandCalledEvent(commandContainer.getSender(), commandContainer.getInvoke(), commandContainer.getArgs(), commandError));
+        AlphaEventCore.callEvent(new CommandCalledEvent(commandContainer.getSender(), commandContainer.getArgs(), commandError));
 
         return commandError;
     }
