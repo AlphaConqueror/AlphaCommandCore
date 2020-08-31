@@ -8,6 +8,7 @@ package de.alphaconqueror.alphacommandcore.commandhandling;
 
 import de.alphaconqueror.alphacommandcore.commandhandling.permission.PermissionRequired;
 import de.alphaconqueror.alphacommandcore.eventhandling.CommandCalledEvent;
+import de.alphaconqueror.alphacommandcore.eventhandling.CommandRegisteredEvent;
 import de.alphaconqueror.alphaeventcore.AlphaEventCore;
 
 import java.lang.reflect.Method;
@@ -15,86 +16,183 @@ import java.util.*;
 
 public class CommandHandler {
 
-    private final Map<String, ICommand> commands = new HashMap<>();
+    private final List<Command> commands = new ArrayList<>();
 
     /**
-     * Handles an {@link ICommand}.
+     * Handles a {@link Command}.
      *
-     * @param message The unparsed message containing invoke and arguments.
-     * @param sender  The sender of the message.
+     * @param command The command to be handled.
+     * @param args    The arguments of the command.
+     * @param sender  The {@link ICommandSender} of the command.
      *
-     * @return The {@link CommandResult} of the handled command.
+     * @return The {@link ICommandResult} of the handled command.
      */
-    public CommandResult handleCommand(String message, ICommandSender sender) {
-        CommandResult commandError = null;
+    public ICommandResult handleCommand(Command command, String[] args, ICommandSender sender) {
+        ICommandResult commandResult = null;
         String permission = "";
 
-        final CommandContainer commandContainer = parse(message, sender);
-        final ICommand cmd = commands.get(commandContainer.getInvoke());
+        if(command == null) {
+            commandResult = new ICommandResult.ERROR_COMMAND_NOT_FOUND(args[0]);
+        } else {
+            for(Method method: command.getClass().getMethods()) {
+                if(method.getName().equals("handle")) {
+                    if(method.getAnnotation(PermissionRequired.class) != null)
+                        permission = method.getAnnotation(PermissionRequired.class).permission();
+                    break;
+                }
+            }
+        }
 
-        for(Method method : cmd.getClass().getMethods()) {
-            if (method.getName().equals("handle")) {
-                if(method.getAnnotation(PermissionRequired.class) != null)
-                    permission = method.getAnnotation(PermissionRequired.class).permission();
+        if (!permission.isEmpty() && !sender.hasPermission(permission))
+                commandResult = new ICommandResult.ERROR_PERMISSION(permission);
+
+        if(commandResult == null)
+            commandResult = command.handle(sender, args);
+
+        AlphaEventCore.callEvent(new CommandCalledEvent(sender, args, commandResult));
+
+        return commandResult;
+    }
+
+    /**
+     * Handles a {@link Command} by a given message.
+     *
+     * @param message The message to be parsed and handled.
+     * @param sender The {@link ICommandSender} of the message.
+     *
+     * @return The {@link ICommandResult} of the handled command.
+     */
+    public ICommandResult handle(String message, ICommandSender sender) {
+        String[] arguments = null;
+        Command command = null;
+        boolean startsWithCallSymbol = false;
+
+        for(Command cmd : commands) {
+            if(message.startsWith(cmd.getCallSymbol())) {
+                startsWithCallSymbol = true;
+
+                List<String> args = splitMessage(message.substring(cmd.getCallSymbol().length()));
+
+                if(invokesEqual(cmd.getInvokes(), args)) {
+                    command = cmd;
+                    arguments = args.toArray(new String[0]);
+                    break;
+                }
+            }
+        }
+
+        if(!startsWithCallSymbol)
+            return new ICommandResult.ERROR_NO_COMMAND(message.charAt(0));
+
+        return handleCommand(command, arguments, sender);
+    }
+
+    /**
+     * Handles a {@link Command} by given arguments.
+     * Note: Does not check if the call symbol of the command is present.
+     *
+     * @param args   The arguments to be handled.
+     * @param sender The {@link ICommandSender} of the arguments.
+     *
+     * @return The {@link ICommandResult} of the handled command.
+     */
+    public ICommandResult handle(String[] args, ICommandSender sender) {
+        Command command = null;
+
+        for(Command cmd : commands) {
+            if(invokesEqual(cmd.getInvokes(), Arrays.asList(args))) {
+                command =  cmd;
                 break;
             }
         }
 
-        if (!permission.isEmpty()) {
-            if(!commandContainer.getSender().hasPermission(permission))
-                commandError = new CommandResult.ERROR_PERMISSION(permission);
-        }
+        return handleCommand(command, args, sender);
+    }
 
-        if(commandError == null) {
-            if(commands.containsKey(commandContainer.getInvoke())) {
-                ICommand command = commands.get(commandContainer.getInvoke());
+    /**
+     * Splits the message into an array without spaces.
+     * Note: The first element contains all spaces in front for invoke matching purposes.
+     *
+     * @param message The message to be split.
+     *
+     * @return The split message.
+     */
+    private List<String> splitMessage(String message) {
+        List<String> split = new ArrayList<>();
+        String arg = "";
 
-                commandError = command.handle(commandContainer.getSender(), commandContainer.getArgs());
+        for(int i = 0; i < message.length(); i++) {
+            char c = message.charAt(i);
+
+            if(c == ' ') {
+                if(!isBlank(arg)) {
+                    split.add(arg);
+                    arg = "";
+                } else if(split.size() == 0)
+                    arg += c;
             } else
-                commandError = new CommandResult.ERROR_COMMAND_NOT_FOUND(commandContainer.getInvoke());
+                arg += c;
         }
 
-        AlphaEventCore.callEvent(new CommandCalledEvent(commandContainer.getSender(), commandContainer.getArgs(), commandError));
+        if(!isBlank(arg))
+            split.add(arg);
 
-        return commandError;
+        return split;
     }
 
     /**
-     * Parses a message into a {@link CommandContainer}.
+     * Checks, if the given string is blank.
      *
-     * @param message The unparsed message.
-     * @param sender  The sender of the message.
+     * @param s The string to be checked.
      *
-     * @return The command container containing all information about the command.
+     * @return True, if the string is empty or only contains spaces, false, if otherwise.
      */
-    private CommandContainer parse(String message, ICommandSender sender) {
-        String[] split = message.split(" "),
-                args = new String[split.length - 1];
-        List<String> splitList = new LinkedList<>();
+    private boolean isBlank(String s) {
+        for(int i = 0; i < s.length(); i++) {
+            if(s.charAt(i) != ' ')
+                return false;
+        }
 
-        Collections.addAll(splitList, split);
-
-        splitList.subList(1, splitList.size()).toArray(args);
-
-        return new CommandContainer(sender, split[0], args);
+        return true;
     }
 
     /**
-     * Gets a {@link Map} of {@link ICommand}s related to their invokes.
+     * Checks, if the given invokes are the same.
      *
-     * @return A map containing commands related to their invokes.
+     * @param invokes The invokes of the command.
+     * @param args The arguments of the parsed message.
+     *
+     * @return True, if the invokes are equal, false, if otherwise.
      */
-    public Map<String, ICommand> getCommands() {
+    private boolean invokesEqual(String[] invokes, List<String> args) {
+        if(invokes.length > args.size())
+            return false;
+
+        for(int i = 0; i < invokes.length; i++) {
+            if(!invokes[i].equals(args.get(i)))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Gets a {@link List} of {@link Command}s related to their invokes.
+     *
+     * @return A list containing commands related to their invokes.
+     */
+    public List<Command> getCommands() {
         return commands;
     }
 
     /**
-     * Registers a {@link ICommand}.
+     * Registers a {@link Command}.
      *
-     * @param invoke  The keyword the command is related to.
      * @param command The command to be added.
      */
-    public void registerCommand(String invoke, ICommand command) {
-        commands.put(invoke, command);
+    public void registerCommand(Command command) {
+        commands.add(command);
+
+        AlphaEventCore.callEvent(new CommandRegisteredEvent(command));
     }
 }

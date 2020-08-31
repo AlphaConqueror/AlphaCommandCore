@@ -6,7 +6,7 @@
 
 package de.alphaconqueror.alphacommandcore.eventhandling;
 
-import de.alphaconqueror.alphacommandcore.commandhandling.CommandResult;
+import de.alphaconqueror.alphacommandcore.commandhandling.ICommandResult;
 import de.alphaconqueror.alphacommandcore.commandhandling.ICommandSender;
 import de.alphaconqueror.alphaeventcore.eventhandling.Event;
 
@@ -14,16 +14,16 @@ public class CommandCalledEvent extends Event {
 
     private final ICommandSender sender;
     private final String[] args;
-    private final CommandResult commandResult;
+    private final ICommandResult commandResult;
 
     /**
      * Constructor of {@link CommandCalledEvent}.
      *
-     * @param sender       The sender of the command.
-     * @param args         The arguments given by the sender.
+     * @param sender        The sender of the command.
+     * @param args          The arguments given by the sender.
      * @param commandResult The command result after handling the command.
      */
-    public CommandCalledEvent(ICommandSender sender, String[] args, CommandResult commandResult) {
+    public CommandCalledEvent(ICommandSender sender, String[] args, ICommandResult commandResult) {
         this.sender = sender;
         this.args = args;
         this.commandResult = commandResult;
@@ -48,11 +48,11 @@ public class CommandCalledEvent extends Event {
     }
 
     /**
-     * Gets the {@link CommandResult} of the command.
+     * Gets the {@link ICommandResult} of the command.
      *
      * @return The command result of the command.
      */
-    public CommandResult getCommandResult() {
+    public ICommandResult getCommandResult() {
         return commandResult;
     }
 }

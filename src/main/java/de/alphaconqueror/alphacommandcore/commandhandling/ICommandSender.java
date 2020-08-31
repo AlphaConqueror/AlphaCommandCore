@@ -18,6 +18,13 @@ public interface ICommandSender {
     void sendMessage(String message);
 
     /**
+     * Sends an error message to the command sender.
+     *
+     * @param message The error message to be sent.
+     */
+    void sendErrorMessage(String message);
+
+    /**
      * Adds a permission to the command sender.
      *
      * @param permission The permission to be added.
