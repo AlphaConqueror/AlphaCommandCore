@@ -1,0 +1,150 @@
+import com.github.spotbugs.snom.SpotBugsTask
+
+plugins {
+    id "java"
+    id "pmd"
+    id "checkstyle"
+    id "de.aaschmid.cpd" version "3.1"
+    id "com.github.spotbugs" version "4.5.1"
+}
+
+group 'de.alphaconqueror.alphacommandcore'
+version '1.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_14
+    targetCompatibility = JavaVersion.VERSION_14
+}
+
+if (!JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14))
+    throw new GradleException("REQUIRES JAVA 14 (WAS ${JavaVersion.current()})")
+
+sourceSets {
+    main {
+        java {
+            srcDir "src/main/java"
+        }
+        resources {
+            srcDir "src/main/resources"
+        }
+    }
+    test {
+        java {
+            srcDir "src/test/java"
+        }
+        resources {
+            srcDir "src/test/resources"
+            srcDir "src/main/resources"
+        }
+        compileClasspath += main.compileClasspath
+    }
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    testImplementation "org.mockito:mockito-core:3.5.7"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.2"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.6.2"
+
+    compile fileTree(dir: 'libs', includes: ['*.jar'])
+
+    spotbugsPlugins "com.mebigfatguy.sb-contrib:sb-contrib:7.4.7"
+    spotbugsPlugins "com.h3xstream.findsecbugs:findsecbugs-plugin:1.10.1"
+
+    checkstyle "com.puppycrawl.tools:checkstyle:8.36.1"
+}
+
+build {
+    dependsOn check
+}
+
+test {
+    useJUnitPlatform()
+}
+
+checkstyle {
+    toolVersion = "8.8"
+    showViolations = true
+    maxWarnings(0)
+    maxErrors(0)
+    configFile file("${projectDir}/config/checkstyle/checkstyle.xml")
+    reportsDir file("${buildDir}/reports/checkstyle")
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        html.enabled true
+        xml.enabled false
+    }
+}
+
+tasks.withType(Pmd) {
+    incrementalAnalysis.set(false)
+    reports {
+        html.enabled true
+        xml.enabled true
+    }
+    ruleSets = ["${projectDir}/config/pmd/pmd.xml"]
+}
+
+cpd {
+    language = 'java'
+    ignoreFailures false
+}
+
+cpdCheck {
+    reports {
+        text.enabled true
+        xml.enabled false
+        csv.enabled false
+    }
+    minimumTokenCount = 128
+    source = sourceSets.main.allJava
+}
+
+spotbugs {
+    toolVersion.set("4.1.2")
+    ignoreFailures.set(false)
+    effort = "max"
+    includeFilter.set(file("${projectDir}/config/spotbugs/include.xml"))
+    excludeFilter.set(file("${projectDir}/config/spotbugs/exclude.xml"))
+}
+
+tasks.withType(SpotBugsTask) {
+    reports {
+        html.enabled true
+        xml.enabled false
+    }
+}
+
+
+
+jar {
+    dependsOn clean
+    dependsOn check
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes(
+            "Implementation-Title": project.name,
+            "Application-Name": project.name,
+            "Implementation-Version": project.version,
+        )
+    }
+
+    archiveFileName = "${project.name}.jar"
+    from configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+
+    doLast {
+        copy {
+            from jar
+            into "E:\\Users\\marcb\\Dokumente\\Java Dependecies"
+        }
+    }
+}
+
+
