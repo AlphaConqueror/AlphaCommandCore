@@ -7,14 +7,17 @@ import de.alphaconqueror.alphacommandcore.commandhandling.commandhandler.testcom
 
 public class TestCommand1 implements ICommand {
 
+  public String[] receivedArgs;
+
   @Override
   public ICommandResult handle(final ICommandSender sender, final String[] args) {
+    this.receivedArgs = args;
     return new TestResult1();
   }
 
   @Override
   public String[] getInvokes() {
-    return new String[] {"test, test11, test12"};
+    return new String[]{"test"};
   }
 
   @Override

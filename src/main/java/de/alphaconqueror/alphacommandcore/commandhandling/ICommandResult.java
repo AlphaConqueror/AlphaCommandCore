@@ -80,16 +80,12 @@ public interface ICommandResult {
     }
   }
 
-  /**
-   * The command result representing a {@link ICommand} that can not be executed due to not
-   * finding it.
-   */
-  final class ErrorCommandNotFound implements ICommandResult {
+  final class ErrorNoInvokeMatch implements ICommandResult {
 
-    private final String invoke;
+    private final String[] invokes;
 
-    public ErrorCommandNotFound(final String invoke) {
-      this.invoke = invoke;
+    public ErrorNoInvokeMatch(final String[] invokes) {
+      this.invokes = invokes.clone();
     }
 
     @Override
@@ -98,12 +94,39 @@ public interface ICommandResult {
     }
 
     /**
-     * Gets the invoke of the missing {@link ICommand}.
+     * Gets the invokes needed for the {@link CommandHandler} to handle a {@link ICommand}.
      *
-     * @return The invoke of the missing command.
+     * @return The invokes needed.
      */
-    public String getInvoke() {
-      return this.invoke;
+    public String[] getInvokes() {
+      return this.invokes.clone();
+    }
+  }
+
+  /**
+   * The command result representing a {@link ICommand} that can not be executed due to not
+   * finding it.
+   */
+  final class ErrorCommandNotFound implements ICommandResult {
+
+    private final String[] invokes;
+
+    public ErrorCommandNotFound(final String[] invokes) {
+      this.invokes = invokes.clone();
+    }
+
+    @Override
+    public boolean isExecutable() {
+      return false;
+    }
+
+    /**
+     * Gets the invokes of the missing {@link ICommand}.
+     *
+     * @return The invokes of the missing command.
+     */
+    public String[] getInvokes() {
+      return this.invokes.clone();
     }
   }
 }
