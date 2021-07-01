@@ -23,10 +23,12 @@ import java.util.Set;
 public class CommandHandler {
 
   private final List<ICommand> commands = new ArrayList<>();
-  private final String callSymbol;
+  private String callSymbol = "";
   private final List<String> defaultInvokes = new ArrayList<>();
   private String separator = " ";
   private boolean ignoreBlanks = true;
+
+  public CommandHandler() { }
 
   public CommandHandler(final String callSymbol) {
     this.callSymbol = callSymbol;
@@ -105,9 +107,9 @@ public class CommandHandler {
     }
 
     AlphaEventCore.callEvent(new CommandCalledEvent(sender, this, argList.toArray(new String[0]),
-            commandResult.get()));
+            commandResult.orElse(null)));
 
-    return commandResult.isPresent() ? commandResult.get() : null;
+    return commandResult.orElse(null);
   }
 
   /**
@@ -118,7 +120,7 @@ public class CommandHandler {
    * @param sender  The {@link ICommandSender} of the command.
    * @return The {@link ICommandResult} of the handled command.
    */
-  public ICommandResult handleCommand(final ICommand command, final String[] args,
+  public static ICommandResult handleCommand(final ICommand command, final String[] args,
           final ICommandSender sender) {
     Optional<ICommandResult> commandResult = Optional.empty();
     Optional<String> permission = Optional.empty();
@@ -136,15 +138,15 @@ public class CommandHandler {
       }
     } catch (final NoSuchMethodException ignored) { }
 
-    if (permission.isPresent() && !sender.hasPermission(permission.get())) {
+    if (permission.isPresent() && sender != null && !sender.hasPermission(permission.get())) {
       commandResult = Optional.of(new ICommandResult.ErrorPermission(permission.get()));
     }
 
     if (commandResult.isEmpty()) {
-      commandResult = Optional.of(command.handle(sender, args));
+      commandResult = Optional.ofNullable(command.handle(sender, args));
     }
 
-    return commandResult.get();
+    return commandResult.orElse(null);
   }
 
   private Optional<ICommand> getCommandMatchingInvokes(final Collection<String> invokes) {
