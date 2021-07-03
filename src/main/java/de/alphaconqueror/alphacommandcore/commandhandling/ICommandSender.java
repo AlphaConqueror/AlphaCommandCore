@@ -6,7 +6,7 @@
 
 package de.alphaconqueror.alphacommandcore.commandhandling;
 
-import de.alphaconqueror.alphacommandcore.commandhandling.permission.OnlyAllowedSenders;
+import de.alphaconqueror.alphacommandcore.commandhandling.annotations.OnlyAllowedSenders;
 
 public interface ICommandSender {
 

@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-package de.alphaconqueror.alphacommandcore.commandhandling.permission;
+package de.alphaconqueror.alphacommandcore.commandhandling.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

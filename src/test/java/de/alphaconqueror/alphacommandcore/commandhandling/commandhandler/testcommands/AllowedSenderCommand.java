@@ -3,7 +3,7 @@ package de.alphaconqueror.alphacommandcore.commandhandling.commandhandler.testco
 import de.alphaconqueror.alphacommandcore.commandhandling.ICommand;
 import de.alphaconqueror.alphacommandcore.commandhandling.ICommandResult;
 import de.alphaconqueror.alphacommandcore.commandhandling.ICommandSender;
-import de.alphaconqueror.alphacommandcore.commandhandling.permission.OnlyAllowedSenders;
+import de.alphaconqueror.alphacommandcore.commandhandling.annotations.OnlyAllowedSenders;
 
 public class AllowedSenderCommand implements ICommand {
 
