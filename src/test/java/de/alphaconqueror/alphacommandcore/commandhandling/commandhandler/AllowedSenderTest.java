@@ -25,7 +25,7 @@ public class AllowedSenderTest {
   }
 
   @Test
-  void simpleNullSender() throws NoSuchMethodException {
+  void simpleNullSender() {
     final ICommandResult commandResult = this.commandHandler.handle("/test", null);
 
     assertEquals(ICommandResult.ErrorIllegalSender.class, commandResult.getClass());
@@ -33,14 +33,14 @@ public class AllowedSenderTest {
   }
 
   @Test
-  void simpleLegalSender() throws NoSuchMethodException {
+  void simpleLegalSender() {
     final ICommandResult commandResult = this.commandHandler.handle("/test", new LegalSender());
 
     assertEquals(ICommandResult.Okay.class, commandResult.getClass());
   }
 
   @Test
-  void simpleIllegalSender() throws NoSuchMethodException {
+  void simpleIllegalSender() {
     final ICommandResult commandResult = this.commandHandler.handle("/test", new IllegalSender());
 
     assertEquals(ICommandResult.ErrorIllegalSender.class, commandResult.getClass());

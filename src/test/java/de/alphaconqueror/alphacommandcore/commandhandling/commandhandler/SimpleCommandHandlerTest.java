@@ -27,7 +27,7 @@ public class SimpleCommandHandlerTest {
   }
 
   @Test
-  void simpleNoCommandTest() throws NoSuchMethodException {
+  void simpleNoCommandTest() {
     assertEquals(ICommandResult.ErrorNoCommand.class,
             this.commandHandler.handle("", mock(ICommandSender.class)).getClass());
     assertEquals(ICommandResult.ErrorNoCommand.class,
@@ -35,13 +35,13 @@ public class SimpleCommandHandlerTest {
   }
 
   @Test
-  void simpleHandleTest() throws NoSuchMethodException {
+  void simpleHandleTest() {
     assertEquals(TestResult1.class,
             this.commandHandler.handle("/test", mock(ICommandSender.class)).getClass());
   }
 
   @Test
-  void simpleArgumentsTest() throws NoSuchMethodException {
+  void simpleArgumentsTest() {
     final String args = "arg1 arg2 arg3";
 
     this.commandHandler.handle("/test " + args, mock(ICommandSender.class));

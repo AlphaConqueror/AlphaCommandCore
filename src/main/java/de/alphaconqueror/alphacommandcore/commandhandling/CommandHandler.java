@@ -61,8 +61,7 @@ public class CommandHandler {
    * @param sender  The {@link ICommandSender} of the message.
    * @return The {@link ICommandResult} of the handled command.
    */
-  public ICommandResult handle(final String message, final ICommandSender sender)
-          throws NoSuchMethodException {
+  public ICommandResult handle(final String message, final ICommandSender sender) {
     if (!message.startsWith(this.callSymbol)) {
       final ICommandResult commandResult = new ICommandResult.ErrorNoCommand(this.callSymbol);
 
@@ -83,8 +82,7 @@ public class CommandHandler {
    * @param sender The {@link ICommandSender} of the arguments.
    * @return The {@link ICommandResult} of the handled command.
    */
-  public ICommandResult handle(final String[] args, final ICommandSender sender)
-          throws NoSuchMethodException {
+  public ICommandResult handle(final String[] args, final ICommandSender sender) {
     Optional<ICommandResult> commandResult = Optional.empty();
     List<String> argList = List.of(args);
 
@@ -123,27 +121,31 @@ public class CommandHandler {
    * @return The {@link ICommandResult} of the handled command.
    */
   public static ICommandResult handleCommand(final ICommand command, final String[] args,
-          final ICommandSender sender) throws NoSuchMethodException {
+          final ICommandSender sender) {
     Optional<ICommandResult> commandResult = Optional.empty();
 
-    final Method method = command.getClass()
-            .getMethod("handle", ICommandSender.class, String[].class);
+    try {
+      final Method method = command.getClass()
+              .getMethod("handle", ICommandSender.class, String[].class);
 
-    if (method.isAnnotationPresent(OnlyAllowedSenders.class)) {
-      if (sender == null) {
-        commandResult = Optional.of(new ICommandResult.ErrorIllegalSender(null));
-      } else if (Arrays.stream(method.getAnnotation(OnlyAllowedSenders.class).identifiers())
-              .noneMatch(sender.getIdentifier()::equals)) {
-        commandResult = Optional.of(new ICommandResult.ErrorIllegalSender(sender.getClass()));
+      if (method.isAnnotationPresent(OnlyAllowedSenders.class)) {
+        if (sender == null) {
+          commandResult = Optional.of(new ICommandResult.ErrorIllegalSender(null));
+        } else if (Arrays.stream(method.getAnnotation(OnlyAllowedSenders.class).identifiers())
+                .noneMatch(sender.getIdentifier()::equals)) {
+          commandResult = Optional.of(new ICommandResult.ErrorIllegalSender(sender.getClass()));
+        }
       }
-    }
 
-    if (commandResult.isEmpty() && method.isAnnotationPresent(PermissionRequired.class)) {
-      final String permission = method.getAnnotation(PermissionRequired.class).permission();
+      if (commandResult.isEmpty() && method.isAnnotationPresent(PermissionRequired.class)) {
+        final String permission = method.getAnnotation(PermissionRequired.class).permission();
 
-      if (sender == null || !sender.hasPermission(permission)) {
-        commandResult = Optional.of(new ICommandResult.ErrorPermission(permission));
+        if (sender == null || !sender.hasPermission(permission)) {
+          commandResult = Optional.of(new ICommandResult.ErrorPermission(permission));
+        }
       }
+    } catch (final NoSuchMethodException e) {
+      e.printStackTrace();
     }
 
     if (commandResult.isEmpty()) {
