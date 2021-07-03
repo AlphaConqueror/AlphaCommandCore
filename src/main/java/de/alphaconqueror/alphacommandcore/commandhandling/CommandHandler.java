@@ -6,8 +6,8 @@
 
 package de.alphaconqueror.alphacommandcore.commandhandling;
 
-import de.alphaconqueror.alphacommandcore.commandhandling.permission.OnlyAllowedSenders;
-import de.alphaconqueror.alphacommandcore.commandhandling.permission.PermissionRequired;
+import de.alphaconqueror.alphacommandcore.commandhandling.annotations.OnlyAllowedSenders;
+import de.alphaconqueror.alphacommandcore.commandhandling.annotations.PermissionRequired;
 import de.alphaconqueror.alphacommandcore.eventhandling.CommandCalledEvent;
 import de.alphaconqueror.alphaeventcore.AlphaEventCore;
 import java.lang.reflect.Method;
@@ -210,20 +210,12 @@ public class CommandHandler {
     final String[] invokes = command.getInvokes();
     final String[] arguments = command.getArguments();
 
-    for (int i = 0; i < this.defaultInvokes.size(); i++) {
-      syntax.append(this.defaultInvokes.get(i));
-
-      if (i + 1 < this.defaultInvokes.size()) {
-        syntax.append(' ');
-      }
+    for (final String defaultInvoke : this.defaultInvokes) {
+      syntax.append(defaultInvoke).append(' ');
     }
 
-    for (int i = 0; i < invokes.length; i++) {
-      syntax.append(invokes[i]);
-
-      if (i + 1 < invokes.length) {
-        syntax.append(' ');
-      }
+    for (final String invoke : invokes) {
+      syntax.append(invoke).append(' ');
     }
 
     for (int i = 0; i < arguments.length; i++) {
