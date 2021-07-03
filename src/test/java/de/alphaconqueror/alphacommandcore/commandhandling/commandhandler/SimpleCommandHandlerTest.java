@@ -7,8 +7,8 @@ import static org.mockito.Mockito.mock;
 import de.alphaconqueror.alphacommandcore.commandhandling.CommandHandler;
 import de.alphaconqueror.alphacommandcore.commandhandling.ICommandResult;
 import de.alphaconqueror.alphacommandcore.commandhandling.ICommandSender;
+import de.alphaconqueror.alphacommandcore.commandhandling.commandhandler.commandresults.TestResult1;
 import de.alphaconqueror.alphacommandcore.commandhandling.commandhandler.testcommands.TestCommand1;
-import de.alphaconqueror.alphacommandcore.commandhandling.commandhandler.testcommands.testcommandresults.TestResult1;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -27,7 +27,7 @@ public class SimpleCommandHandlerTest {
   }
 
   @Test
-  void simpleNoCommandTest() {
+  void simpleNoCommandTest() throws NoSuchMethodException {
     assertEquals(ICommandResult.ErrorNoCommand.class,
             this.commandHandler.handle("", mock(ICommandSender.class)).getClass());
     assertEquals(ICommandResult.ErrorNoCommand.class,
@@ -35,13 +35,13 @@ public class SimpleCommandHandlerTest {
   }
 
   @Test
-  void simpleHandleTest() {
+  void simpleHandleTest() throws NoSuchMethodException {
     assertEquals(TestResult1.class,
             this.commandHandler.handle("/test", mock(ICommandSender.class)).getClass());
   }
 
   @Test
-  void simpleArgumentsTest() {
+  void simpleArgumentsTest() throws NoSuchMethodException {
     final String args = "arg1 arg2 arg3";
 
     this.commandHandler.handle("/test " + args, mock(ICommandSender.class));

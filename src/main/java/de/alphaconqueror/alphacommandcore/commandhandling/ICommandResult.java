@@ -129,4 +129,31 @@ public interface ICommandResult {
       return this.invokes.clone();
     }
   }
+
+  /**
+   * The command result representing a {@link ICommand} that can not be executed due to an
+   * illegal {@link ICommandSender} trying to execute it.
+   */
+  final class ErrorIllegalSender implements ICommandResult {
+
+    private final Class<? extends ICommandSender> commandSenderClass;
+
+    public ErrorIllegalSender(final Class<? extends ICommandSender> commandSenderClass) {
+      this.commandSenderClass = commandSenderClass;
+    }
+
+    @Override
+    public boolean isExecutable() {
+      return false;
+    }
+
+    /**
+     * Gets the {@link ICommandSender} that tries to execute a {@link ICommand}.
+     *
+     * @return The command sender that tries to execute a command.
+     */
+    public Class<? extends ICommandSender> getCommandSenderClass() {
+      return this.commandSenderClass;
+    }
+  }
 }

@@ -6,6 +6,7 @@
 
 package de.alphaconqueror.alphacommandcore.commandhandling;
 
+import de.alphaconqueror.alphacommandcore.commandhandling.permission.OnlyAllowedSenders;
 import de.alphaconqueror.alphacommandcore.commandhandling.permission.PermissionRequired;
 import de.alphaconqueror.alphacommandcore.eventhandling.CommandCalledEvent;
 import de.alphaconqueror.alphaeventcore.AlphaEventCore;
@@ -17,7 +18,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @SuppressWarnings("PMD.LinguisticNaming")
 public class CommandHandler {
@@ -61,7 +61,8 @@ public class CommandHandler {
    * @param sender  The {@link ICommandSender} of the message.
    * @return The {@link ICommandResult} of the handled command.
    */
-  public ICommandResult handle(final String message, final ICommandSender sender) {
+  public ICommandResult handle(final String message, final ICommandSender sender)
+          throws NoSuchMethodException {
     if (!message.startsWith(this.callSymbol)) {
       final ICommandResult commandResult = new ICommandResult.ErrorNoCommand(this.callSymbol);
 
@@ -82,7 +83,8 @@ public class CommandHandler {
    * @param sender The {@link ICommandSender} of the arguments.
    * @return The {@link ICommandResult} of the handled command.
    */
-  public ICommandResult handle(final String[] args, final ICommandSender sender) {
+  public ICommandResult handle(final String[] args, final ICommandSender sender)
+          throws NoSuchMethodException {
     Optional<ICommandResult> commandResult = Optional.empty();
     List<String> argList = List.of(args);
 
@@ -121,25 +123,27 @@ public class CommandHandler {
    * @return The {@link ICommandResult} of the handled command.
    */
   public static ICommandResult handleCommand(final ICommand command, final String[] args,
-          final ICommandSender sender) {
+          final ICommandSender sender) throws NoSuchMethodException {
     Optional<ICommandResult> commandResult = Optional.empty();
-    Optional<String> permission = Optional.empty();
 
-    try {
-      for (final Method method : command.getClass().getMethods()) {
-        if (ICommand.class.getMethod("handle", ICommandSender.class, String[].class)
-                .equals(command.getClass()
-                        .getMethod("handle", ICommandSender.class, String[].class))) {
-          if (method.isAnnotationPresent(PermissionRequired.class)) {
-            permission = Optional.of(method.getAnnotation(PermissionRequired.class).permission());
-          }
-          break;
-        }
+    final Method method = command.getClass()
+            .getMethod("handle", ICommandSender.class, String[].class);
+
+    if (method.isAnnotationPresent(OnlyAllowedSenders.class)) {
+      if (sender == null) {
+        commandResult = Optional.of(new ICommandResult.ErrorIllegalSender(null));
+      } else if (Arrays.stream(method.getAnnotation(OnlyAllowedSenders.class).identifiers())
+              .noneMatch(sender.getIdentifier()::equals)) {
+        commandResult = Optional.of(new ICommandResult.ErrorIllegalSender(sender.getClass()));
       }
-    } catch (final NoSuchMethodException ignored) { }
+    }
 
-    if (permission.isPresent() && sender != null && !sender.hasPermission(permission.get())) {
-      commandResult = Optional.of(new ICommandResult.ErrorPermission(permission.get()));
+    if (commandResult.isEmpty() && method.isAnnotationPresent(PermissionRequired.class)) {
+      final String permission = method.getAnnotation(PermissionRequired.class).permission();
+
+      if (sender == null || !sender.hasPermission(permission)) {
+        commandResult = Optional.of(new ICommandResult.ErrorPermission(permission));
+      }
     }
 
     if (commandResult.isEmpty()) {
@@ -245,24 +249,6 @@ public class CommandHandler {
     this.commands.add(command);
     this.commands.sort(Comparator.comparingInt(cmd -> cmd.getInvokes().length));
     Collections.reverse(this.commands);
-  }
-
-  /**
-   * Adds {@link ICommandSender}s to a {@link Set}.
-   *
-   * @param sender The senders to be added.
-   */
-  public void addSender(final ICommandSender... sender) {
-    addSenders(Arrays.asList(sender));
-  }
-
-  /**
-   * Adds a {@link Collection} of {@link ICommandSender}s to a {@link Set}.
-   *
-   * @param senders The senders to be added.
-   */
-  public void addSenders(final Collection<ICommandSender> senders) {
-    senders.forEach(sender -> this.addSender(sender));
   }
 
   /**

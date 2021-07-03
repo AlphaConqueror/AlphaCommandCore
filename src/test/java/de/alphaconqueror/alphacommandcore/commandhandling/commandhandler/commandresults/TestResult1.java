@@ -1,4 +1,4 @@
-package de.alphaconqueror.alphacommandcore.commandhandling.commandhandler.testcommands.testcommandresults;
+package de.alphaconqueror.alphacommandcore.commandhandling.commandhandler.commandresults;
 
 import de.alphaconqueror.alphacommandcore.commandhandling.ICommandResult;
 

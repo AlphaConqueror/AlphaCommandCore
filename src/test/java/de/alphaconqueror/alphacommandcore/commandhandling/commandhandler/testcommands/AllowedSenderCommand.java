@@ -3,16 +3,14 @@ package de.alphaconqueror.alphacommandcore.commandhandling.commandhandler.testco
 import de.alphaconqueror.alphacommandcore.commandhandling.ICommand;
 import de.alphaconqueror.alphacommandcore.commandhandling.ICommandResult;
 import de.alphaconqueror.alphacommandcore.commandhandling.ICommandSender;
-import de.alphaconqueror.alphacommandcore.commandhandling.commandhandler.commandresults.TestResult1;
+import de.alphaconqueror.alphacommandcore.commandhandling.permission.OnlyAllowedSenders;
 
-public class TestCommand1 implements ICommand {
-
-  public String[] receivedArgs;
+public class AllowedSenderCommand implements ICommand {
 
   @Override
+  @OnlyAllowedSenders(identifiers = {"testsender"})
   public ICommandResult handle(final ICommandSender sender, final String[] args) {
-    this.receivedArgs = args;
-    return new TestResult1();
+    return new ICommandResult.Okay();
   }
 
   @Override

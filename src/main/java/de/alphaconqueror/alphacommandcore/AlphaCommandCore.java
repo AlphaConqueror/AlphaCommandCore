@@ -29,7 +29,8 @@ public class AlphaCommandCore {
    * @param message The message to be parsed.
    * @param sender  The sender of the message.
    */
-  public static void parse(final String message, final ICommandSender sender) {
+  public static void parse(final String message, final ICommandSender sender)
+          throws NoSuchMethodException {
     for (final CommandHandler commandHandler : COMMAND_HANDLERS) {
       if (!(commandHandler.handle(message, sender) instanceof ICommandResult.ErrorNoCommand)) {
         break;
@@ -43,14 +44,12 @@ public class AlphaCommandCore {
    * Note: The command handlers can not have the same call symbol.
    *
    * @param commandHandler The command handler to be added.
-   *
    * @throws UnsupportedOperationException if the command handler has the same call symbol
    *                                       as an existing command handler.
    */
   public static void addCommandHandler(final CommandHandler commandHandler) {
-    if (COMMAND_HANDLERS.stream().map(CommandHandler::getCallSymbol)
-            .anyMatch(callSymbol -> commandHandler.getCallSymbol()
-                    .equals(commandHandler.getCallSymbol()))) {
+    if (COMMAND_HANDLERS.stream().map(CommandHandler::getCallSymbol).anyMatch(
+            callSymbol -> commandHandler.getCallSymbol().equals(commandHandler.getCallSymbol()))) {
       throw new UnsupportedOperationException("Duplicate call symbol.");
     }
 
